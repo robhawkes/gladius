@@ -7,14 +7,6 @@ define( function( require ) {
   var CubicVR = require( 'CubicVR.js/CubicVR' ),
       lang = require( '../core/lang' );
 
-  function physics( options ) {
-
-    options = options || {};
-
-    this.CubicVR = CubicVR;
-
-  }
-
-  return physics;
+  return CubicVR.ScenePhysics;
 
 });
