@@ -284,4 +284,5 @@ define( function ( require ) {
   } //system
 
   return graphicsCubicVR;
+
 });
