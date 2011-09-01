@@ -70,3 +70,7 @@ check-lint-core:
 
 check-lint-subsystems:
 	@@$(foreach subsystem,$(SUBSYSTEM_FILES),echo "-----" ; $(call jshint,$(subsystem)) ; )
+
+submodule:
+	@@git submodule update --init --recursive
+	@@git submodule status --recursive
