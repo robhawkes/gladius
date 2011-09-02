@@ -4,18 +4,17 @@
 define( function ( require ) {
   var lang = require( './core/lang' ),
       Tasker = require( './core/Tasker' ),
-      Loader = require( './core/Loader' ),
       KeyboardInput = require( './input/KeyboardInput' ),
       MouseInput = require( './input/MouseInput' ),
       TouchInput = require( './input/TouchInput' ),
       InputMap = require( './input/InputMap' ),
       Messenger = require( './core/Messenger' ),
-      Scene = require( './core/Scene' ),
+      Scene = require( './core/scene/Scene' ),
       Entity = require( './core/Entity' ),
-      SpatialComponent = require( './core/SpatialComponent' ),
-      CameraComponent = require( './core/CameraComponent' ),
-      ModelComponent = require( './core/ModelComponent' ),
-      SpeakerComponent = require( './core/SpeakerComponent' ),
+      SpatialComponent = require( './core/scene/Spatial' ),
+      CameraComponent = require( './core/component/Camera' ),
+      ModelComponent = require( './core/component/Model' ),
+      SpeakerComponent = require( './core/component/Speaker' ),
 
       Paladin, i, args,
 
@@ -48,7 +47,6 @@ define( function ( require ) {
     this.debug = this.options.debug ? console.log : function () {};
     this.tasker = new Tasker();
     this.messenger = new Messenger( this.tasker );
-    this.loader = new Loader();
 
     // Init instance of each subsystem and store reference as subsystem name
     subsystems = this.options.subsystems || global.subsystems;
