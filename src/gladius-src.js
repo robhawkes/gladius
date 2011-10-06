@@ -3,12 +3,12 @@
 
 define( function ( require ) {
     var lang = require( './core/lang' ),
-        _Math = require( './common/Math' ),  
-        Entity = require( './core/Entity' ),
-        Component = require( './core/Component' ),
-        Scene = require( './core/Scene' ),
-        Logic = require( './core/component/Logic' ),
-        // Transform = require( './core/component/Transform' ),
+    _Math = require( './common/Math' ),  
+    Entity = require( './core/Entity' ),
+    Component = require( './core/Component' ),
+    Scene = require( './core/Scene' ),
+    Transform = require( './core/component/Transform' ),
+    Logic = require( './core/component/Logic' ),    
 
     Gladius, i, args,
 
@@ -16,8 +16,8 @@ define( function ( require ) {
     // exist, mainly gladius.ready from gladius.js. Check tools/wrap.start
     // for protections against overwriting an existing gladius in the page,
     // for when gladius is built for deployment.
-    global = window.gladius || ( window.gladius = {} );
-
+    global = window.gladius || ( window.gladius = {} );    
+    
     // Utility to bridge the gap between constructor functions
     // that need to know the gladius instance.
     function partialCtor( Func, instance ) {
@@ -50,7 +50,7 @@ define( function ( require ) {
                 sIds.push('./' + subsystems[prop]);
             }
         }
-        
+
         var _math = new _Math();
         Object.defineProperty( this, 'math', {
             get: function() {
@@ -91,22 +91,33 @@ define( function ( require ) {
             // this.physics = subs.physics;
             // this.sound = subs.sound;
 
-            // Expose Paladin objects, partially
+            // Expose engine objects, partially
             // applying items needed for their constructors.
             lang.extend(this, {
                 core: {
-                    Entity: partialCtor( Entity, this ),
+                    Entity: Entity( this ),
                     Component: Component,
-                    Scene: partialCtor( Scene, this ),
+                    Scene: Scene( this ),
                     component: {
-//                        Transform: Transform
-                        Logic: partialCtor( Logic, this )
-                    }
+                        Transform: Transform( this ),
+                        Logic: Logic( this )
+                    },
+                    resource: {}
+                },
+                graphics: {
+                    component: {},
+                    resource: {}
+                },
+                physics: {
+                    component: {},
+                    resource: {}
+                },
+                sound: {
+                    component: {},
+                    resource: {}
                 }
             });
 
-            this.core.component.Logic = this.core.component.Logic();
-            
             this.assert = function( condition, message ) {
                 if( !condition )
                     throw 'Assertion failed: ' + message;
@@ -127,14 +138,14 @@ define( function ( require ) {
                 this.options.setup( this );
             }
 
-            // Let caller know the Paladin instance is ready.
+            // Let caller know the engine instance is ready.
             if (callback) {
                 callback(this);
             }
         }));
     }; //Gladius
 
-    // Set up common properties for all Paladin instances
+//  Set up common properties for all engine instances
     Gladius.prototype = {
 
             run: function () {
@@ -145,21 +156,21 @@ define( function ( require ) {
             }
     };
 
-    // Export the public API for creating Paladin instances.
+//  Export the public API for creating engine instances.
     global.create = function ( options, callback ) {
         return new Gladius( options, callback );
     };
 
-    // Any default subsystems that should be created if
-    // caller to gladius.create() does not explicitly ask for
-    // subsystems in the options.
+//  Any default subsystems that should be created if
+//  caller to gladius.create() does not explicitly ask for
+//  subsystems in the options.
     global.subsystems = {
             // physics: 'physics/default',
             // graphics: 'graphics/cubicvr',
             // sound: 'sound/default'
     };
 
-    // Call any callbacks waiting for gladius to be available.
+//  Call any callbacks waiting for gladius to be available.
     if ( global._waitingCreates ) {
         for ( i = 0; (args = global._waitingCreates[i]); i++ ) {
             global.create.apply(global, args);
