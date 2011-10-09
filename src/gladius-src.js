@@ -3,12 +3,12 @@
 
 define( function ( require ) {
     var lang = require( './core/lang' ),
-    _Math = require( './common/Math' ),  
-    Entity = require( './core/Entity' ),
-    Component = require( './core/Component' ),
-    Scene = require( './core/Scene' ),
-    Transform = require( './core/component/Transform' ),
-    Logic = require( './core/component/Logic' ),    
+        _Math = require( '../external/gladius.math/src/Math' ),  
+        Entity = require( './core/Entity' ),
+        Component = require( './core/Component' ),
+        Scene = require( './core/Scene' ),
+        Transform = require( './core/component/Transform' ),
+        Logic = require( './core/component/Logic' ),    
 
     Gladius, i, args,
 
