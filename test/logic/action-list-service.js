@@ -14,7 +14,7 @@
             gladius.create({
                   debug: true,
                   services: {
-                    actionList: 'logic/action-list/service'
+                    actionListService: 'logic/action-list/service'
                   }
               }, function( instance ) {       
                   engine = instance;
@@ -27,9 +27,26 @@
         }
     });
 
-    test( 'Construction', function() {
-        expect( 1 );
-        ok( engine.actionList, 'action-list service exists' );
+    test( 'Service Construction', function() {
+        expect( 2 );
+        ok( engine.actionListService, 'action-list service instantiation' );
+
+        ok( engine.actionListService.component.actionList, 
+            'action list prototype exists' );
+    });
+
+    test( 'Action and ActionList construction', function() {
+        expect( 2 );
+
+        var al = new engine.actionListService.component.ActionList();
+        notEqual(al, null, "action list constructed");
+
+        engine.actionListService.resource.Action( {
+          source: "assets/test-action.json",
+          onsuccess: function (instance) {
+            notEqual(instance, null, "action list constructed");            
+          }  
+        } );
     });
 
 }());

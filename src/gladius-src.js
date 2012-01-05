@@ -14,7 +14,7 @@ define( function ( require ) {
         // Services
         Service = require( 'base/service' ),
         // Graphics = require( './graphics/service' ),
-        ActionLists = require( 'logic/action-list/service' ),
+        // ActionLists = require( 'logic/action-list/service' ),
 
         Resource = require( 'base/resource' ),
         Space = require( 'core/space' ),

@@ -6,17 +6,19 @@ define( function ( require ) {
 
 	return function( engine ) {
 
-		var ActionList = engine.base.Service({
+		var ActionListService = engine.base.Service({
 			type: 'Logic',
 			time: engine.scheduler.simulationTime
 		},
-		function( options ) {
+		function actionListServiceInstanceConstructor( options ) {
 
 			var that = this;
 
-			this.update = function() {
+			this.update = function() {			
 			};
-
+  
+      // create prototype actionlist objects
+      
 		});
 
 		return ActionList;
