@@ -1,0 +1,5 @@
+{
+    "mask": 0,
+    "blocking": true,
+    "script": "equal( actionList.size, 1, 'action is removed when it completes' ); start(); return true;"
+}

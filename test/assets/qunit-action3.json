@@ -1,0 +1,5 @@
+{
+    "mask": 0,
+    "blocking": true,
+    "script": "if( ++ actionList.counter > 1 ) { ok( 'action has run multiple times' ); return true; } else { ok( 'action has run once' ); return false }"
+}

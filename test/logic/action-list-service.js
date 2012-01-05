@@ -12,13 +12,13 @@
             stop();
 
             gladius.create({
-                  debug: true,
-                  services: {
+                debug: true,
+                services: {
                     actionListService: 'logic/action-list/service'
-                  }
-              }, function( instance ) {       
-                  engine = instance;
-                  start();
+                }
+            }, function( instance ) {       
+                engine = instance;
+                start();
             });
         },
 
@@ -32,21 +32,107 @@
         ok( engine.actionListService, 'action-list service instantiation' );
 
         ok( engine.actionListService.component.actionList, 
-            'action list prototype exists' );
+        'action list prototype exists' );
     });
 
-    test( 'Action and ActionList construction', function() {
+    asyncTest( 'Action and ActionList construction', function() {
         expect( 2 );
 
         var al = new engine.actionListService.component.ActionList();
         notEqual(al, null, "action list constructed");
 
         engine.actionListService.resource.Action( {
-          source: "assets/test-action.json",
-          onsuccess: function (instance) {
-            notEqual(instance, null, "action list constructed");            
-          }  
+            source: "assets/test-action.json",
+            onsuccess: function (instance) {
+                notEqual(instance, null, "action list constructed");
+                start();
+            }  
         } );
     });
+
+    asyncTest( 'Run an action that finishes', function() {
+        expect( 4 );
+
+        var entity = new engine.core.Entity({
+            components: [
+                         new engine.actionListService.component.ActionList
+                         ]
+        });
+
+        var resources = {};
+
+        engine.actionListService.resource.Action({
+            source: "assets/qunit-action1.json",
+            onsuccess: function( instance ) {
+                resources[ 'assets/qunit-action1.json' ] = instance;
+                doTest();
+            }            
+        });
+
+        engine.actionListService.resource.Action( {
+            source: "assets/qunit-action2.json",
+            onsuccess: function( instance ) {
+                resources[ 'assets/qunit-action2.json' ] = instance;
+                doTest();
+            }
+        } );
+
+        var doTest = function() {
+            if( Object.keys( resources ).length !== 2 ) {
+                return;
+            }
+
+            // TD: update this test for multithreaded environments
+            var actionList = entity.find( 'Logic' );
+            equal(
+                    actionList.size,
+                    0,
+                    'action list is empty'
+            );
+            actionList.push( new resources[ 'assets/quint-action2.json' ]() );
+            actionList.push( new resources[ 'assets/quint-action1.json' ]() );
+            equal(
+                    actionList.size,
+                    2,
+                    'action list has 2 action'
+            );
+        };
+
+    });
+
+    asyncTest( 'Run an action that does not finish', function() {
+        expect( 4 );
+
+        var entity = new engine.core.Entity({
+            components: [
+                         new engine.actionListService.component.ActionList
+                         ]
+        });
+
+        engine.actionListService.resource.Action( {
+            source: "assets/qunit-action3.json",
+            onsuccess: function( instance ) {
+                var actionList = entity.find( 'Logic' );
+                actionList.counter = 0;
+                equal(
+                        actionList.size,
+                        0,
+                        'action list is empty'
+                );
+                actionList.push( new instance() );
+                equal(
+                        actionList.size,
+                        1,
+                        'action list has 1 action'
+                );
+            }
+        } );
+    });
+    
+    // Test that masks work.
+    
+    // Test that blocking flag works.
+    
+    // Action environment (can see actionList) is correct.
 
 }());
