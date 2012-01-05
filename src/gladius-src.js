@@ -11,10 +11,10 @@ define( function ( require ) {
         Event = require( 'core/event' ),
         Queue = require( 'common/queue' ),
 
-    // Services
+        // Services
         Service = require( 'base/service' ),
         // Graphics = require( './graphics/service' ),
-        // ActionLists = require( './behavior/action-list/service' ),
+        ActionLists = require( 'logic/action-list/service' ),
 
         Resource = require( 'base/resource' ),
         Space = require( 'core/space' ),
