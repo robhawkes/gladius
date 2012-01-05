@@ -65,6 +65,30 @@ define( function ( require ) {
                     _ownerChanged( options );
                 }
             };
+            
+            var _add = new Delegate();
+            Object.defineProperty( this, 'add', {
+                get: function() {
+                    return _add;
+                }
+            });
+            var onAdd = function( options ) {
+                if( _add ) {
+                    _add( options );
+                }
+            };
+            
+            var _remove = new Delegate();
+            Object.defineProperty( this, 'remove', {
+                get: function() {
+                    return _remove;
+                }
+            });
+            var onRemove = function( options ) {
+                if( _remove ) {
+                    _remove( options );
+                }
+            };
 
             c.call( this, options );
             
