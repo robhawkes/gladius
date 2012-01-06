@@ -1,7 +1,8 @@
 /*jshint white: false, strict: false, plusplus: false, onevar: false,
   nomen: false */
 /*global gladius: false, document: false, window: false, module: false, start,
-  test: false, expect: false, ok: false, notEqual: false, stop, QUnit: false */
+  test: false, expect: false, ok: false, notEqual: false, stop, QUnit: false,
+  asyncTest: false, equal: false, doTest: false */
 
 (function() {
 
@@ -31,7 +32,7 @@
         expect( 2 );
         ok( engine.actionListService, 'action-list service instantiation' );
 
-        ok( engine.actionListService.component.actionList, 
+        ok( engine.actionListService.component.ActionList, 
         'action list prototype exists' );
     });
 
@@ -55,7 +56,7 @@
 
         var entity = new engine.core.Entity({
             components: [
-                         new engine.actionListService.component.ActionList
+                         new engine.actionListService.component.ActionList()
                          ]
         });
 
