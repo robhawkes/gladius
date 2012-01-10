@@ -54,11 +54,8 @@
     asyncTest( 'Run an action that finishes', function() {
         expect( 4 );
 
-        var entity = new engine.core.Entity({
-            components: [
-                         new engine.actionListService.component.ActionList()
-                         ]
-        });
+        var entity = new engine.core.Entity();
+        entity.add(new engine.actionListService.component.ActionList());
 
         var resources = {};
 
@@ -86,14 +83,14 @@
             // TD: update this test for multithreaded environments
             var actionList = entity.find( 'Logic' );
             equal(
-                    actionList.size,
+                    actionList.length,
                     0,
                     'action list is empty'
             );
             actionList.push( new resources[ 'assets/quint-action2.json' ]() );
             actionList.push( new resources[ 'assets/quint-action1.json' ]() );
             equal(
-                    actionList.size,
+                    actionList.length,
                     2,
                     'action list has 2 action'
             );
@@ -104,11 +101,9 @@
     asyncTest( 'Run an action that does not finish', function() {
         expect( 4 );
 
-        var entity = new engine.core.Entity({
-            components: [
-                         new engine.actionListService.component.ActionList
-                         ]
-        });
+        var entity = new engine.core.Entity();
+        entity.add(new engine.actionListService.component.ActionList());
+
 
         engine.actionListService.resource.Action( {
             source: "assets/qunit-action3.json",
@@ -116,13 +111,13 @@
                 var actionList = entity.find( 'Logic' );
                 actionList.counter = 0;
                 equal(
-                        actionList.size,
+                        actionList.length,
                         0,
                         'action list is empty'
                 );
                 actionList.push( new instance() );
                 equal(
-                        actionList.size,
+                        actionList.length,
                         1,
                         'action list has 1 action'
                 );
