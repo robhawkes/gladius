@@ -87,12 +87,12 @@
                     0,
                     'action list is empty'
             );
-            actionList.push( new resources[ 'assets/quint-action2.json' ]() );
-            actionList.push( new resources[ 'assets/quint-action1.json' ]() );
+            actionList.push( resources[ 'assets/quint-action2.json' ] );
+            actionList.push( resources[ 'assets/quint-action1.json' ] );
             equal(
                     actionList.length,
                     2,
-                    'action list has 2 action'
+                    'action list has 2 actions'
             );
         };
 
