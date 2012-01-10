@@ -11,14 +11,17 @@ define( function ( require ) {
             cache: null
         },
         function( source ) {
-            
-            source = source || {};
-            source.text = source.text || '';
-            source.parameters = source.parameters || [];
 
-            var _script = new Function( source.parameters, source.text );
-            
-            Object.defineProperty( this, 'run', {
+            source = source || {};
+            source.script = source.script || '';
+            //TD: need to test parameter functionality
+            source.parameters = source.parameters || [];
+            this.blocking = source.blocking || false;
+            this.mask = source.mask || 0;
+
+            var _script = new Function( source.parameters, source.script );
+
+            Object.defineProperty( this, 'update', {
                 get: function() {
                     return _script;
                 }
