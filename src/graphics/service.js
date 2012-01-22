@@ -3,32 +3,23 @@
 /*global define: false, console: false, window: false, setTimeout: false */
 
 define( function ( require ) {
-
-    var requestAnimFrame = (function() {
-        return window.requestAnimationFrame ||
-           window.webkitRequestAnimationFrame ||
-           window.mozRequestAnimationFrame ||
-           window.oRequestAnimationFrame ||
-           window.msRequestAnimationFrame ||
-           function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-               window.setTimeout(callback, 1000/60);
-           };
-    })();
-    
+  
     require( 'CubicVR.js/CubicVR' );
     
     var CubicVR = this.CubicVR,
 
-        Resource = require( '../core/resource' ),
         Mesh = require( './resource/mesh' ),
         Material = require( './resource/material' ),
+        LightResource = require( './resource/light' ),
         Target = require( './target' ),
 
         Model = require( './component/model' ),
         Camera = require( './component/camera' ),
+        Light = require( './component/light' ),
 
         MeshProceduralCube = require( './script/mesh/procedural/cube' );
         SampleColorMaterial = require( './script/material/procedural/sample' );
+        SampleLight = require( './script/light/procedural/sample' );
 
     return function( engine ) {
 
@@ -37,11 +28,6 @@ define( function ( require ) {
         
         var Graphics = engine.base.Service({
           type: 'Graphics',
-          schedule: {
-            update: {
-              phase: engine.scheduler.phases.RENDER,
-            }
-          },
           time: engine.scheduler.realTime
         },
         function( options ) {
@@ -77,6 +63,7 @@ define( function ( require ) {
                     models,
                     model,
                     transform,
+                    lights,
                     gl = _target.context.GLCore.gl;
 
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -85,6 +72,14 @@ define( function ( require ) {
                     scene = _scenes[ si ];
                     cameras = scene.findAllWith( 'Camera' );
                     models = scene.findAllWith( 'Model' );
+                    lights = scene.findAllWith( 'Light' );
+
+                    var cvrLights = [];
+                    for( var li = 0, ll = lights.length; li < ll; ++li ) {
+                        var lightComponent = lights[ li ].find( 'Light' ); 
+                        lightComponent.prepareForRender();
+                        cvrLights.push( lightComponent._cvr.light );
+                    } //for lights
 
                     for( var ci = 0, cl = cameras.length; ci < cl; ++ci ) {
                         camera = cameras[ ci ].find( 'Camera' );
@@ -94,10 +89,12 @@ define( function ( require ) {
                               
                                 model = models[ mi ].find( 'Model' );
                                 transform = models[ mi ].find( 'Transform' );
+                                camera.prepareForRender();
                                 _target.context.renderObject(
                                     model.mesh._cvr.mesh,
                                     camera._cvr.camera,
-                                    transform.absolute
+                                    transform.absolute,
+                                    cvrLights 
                                 );
 
                             } //for models
@@ -111,22 +108,9 @@ define( function ( require ) {
              
             }; //render
 
-            var handleAnimFrame = function() {
-              _canRender = true;
-              requestAnimFrame( handleAnimFrame );
-            };
-            requestAnimFrame( handleAnimFrame );
-
-            this.update = function() {
-              if (_canRender) {
-                _this.render();
-                _canRender = false;
-              } //if
-            }; //update
-
             var _resources = {
 
-                Light: null,
+                Light: LightResource( engine ),
                 Material: Material( engine, _target.context ),
                 Mesh: Mesh( engine, _target.context ),
                 Shader: null,
@@ -153,6 +137,9 @@ define( function ( require ) {
                 },
                 material: {
                     sample: SampleColorMaterial
+                },
+                light: {
+                    sample: SampleLight
                 }
 
             };
@@ -172,7 +159,8 @@ define( function ( require ) {
             var _components = {
 
                 Model: Model( engine, _this, _target.context ),
-                Camera: Camera( engine, _this, _target.context )
+                Camera: Camera( engine, _this, _target.context ),
+                Light: Light( engine, _this, _target.context )
 
             };
 
