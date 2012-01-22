@@ -38,17 +38,18 @@
 
     asyncTest( 'Action and ActionList construction', function() {
         expect( 2 );
-
+        
         var al = new engine.actionListService.component.ActionList();
         notEqual(al, null, "action list constructed");
-
+        
         engine.actionListService.resource.Action( {
-            source: "assets/test-action.json",
+            url: "assets/test-action.json",
             onsuccess: function (instance) {
                 notEqual(instance, null, "action list constructed");
                 start();
             }  
         } );
+
     });
 
     asyncTest( 'Run an action that finishes', function() {
@@ -60,15 +61,15 @@
         var resources = {};
 
         engine.actionListService.resource.Action({
-            source: "assets/qunit-action1.json",
+            url: "assets/qunit-action1.json",
             onsuccess: function( instance ) {
                 resources[ 'assets/qunit-action1.json' ] = instance;
                 doTest();
-            }            
+            }
         });
 
         engine.actionListService.resource.Action( {
-            source: "assets/qunit-action2.json",
+            url: "assets/qunit-action2.json",
             onsuccess: function( instance ) {
                 resources[ 'assets/qunit-action2.json' ] = instance;
                 doTest();
@@ -87,13 +88,14 @@
                     0,
                     'action list is empty'
             );
+
             actionList.push( resources[ 'assets/quint-action2.json' ] );
             actionList.push( resources[ 'assets/quint-action1.json' ] );
             equal(
                     actionList.length,
                     2,
                     'action list has 2 actions'
-            );
+            );            
         };
 
     });
@@ -104,9 +106,8 @@
         var entity = new engine.core.Entity();
         entity.add(new engine.actionListService.component.ActionList());
 
-
         engine.actionListService.resource.Action( {
-            source: "assets/qunit-action3.json",
+            url: "assets/qunit-action3.json",
             onsuccess: function( instance ) {
                 var actionList = entity.find( 'Logic' );
                 actionList.counter = 0;

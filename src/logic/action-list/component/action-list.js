@@ -24,27 +24,22 @@ define( function ( require ) {
 			var _list = [],
 			_blockMask = 0,
 			_index = 0;
-
-			var update = function( time ) {			
-				while( _index < _list.length ) {
-					var action = _list[_index];
-
-					if( action.mask & _blockMask ) {
-						continue;
-					}
-
-					if( action.update.call( this ) ) {
-					    _list.splice( _index, 1 );
-					    continue;
-					}
-					
-					if( action.blocking ) {
-					    _blockMask |= action.mask;
-					}
-					
-					++ _index;
-				}
+			
+			this.push = function( action ) {
+			    _list.push( action );
 			};
+			
+			Object.defineProperty( this, 'length', {
+			    get: function() {
+			        return _list.length;
+			    }
+			});
+			
+			Object.defineProperty( this, 'list', {
+			    get: function() {
+			        return _list;
+			    }
+			});
 
 		});
 

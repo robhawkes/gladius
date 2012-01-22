@@ -4,49 +4,65 @@
 
 define( function ( require ) {
 
-  // XXX why is this long path required, unlike in the graphics service?
-  var ActionList = require('logic/action-list/component/action-list');
-  var Action = require('logic/action-list/resource/action');
-    
-	return function( engine ) {
+    // XXX why is this long path required, unlike in the graphics service?
+    var ActionList = require('logic/action-list/component/action-list');
+    var Action = require('logic/action-list/resource/action');
 
-		var ActionListService = engine.base.Service({
-			type: 'Logic',
-			time: engine.scheduler.simulationTime
-		},
-		
-		function actionListServiceInstanceConstructor( options ) {
+    return function( engine ) {
 
-			var that = this;
+        var ActionListService = engine.base.Service({
+            type: 'Logic',
+            time: engine.scheduler.simulationTime
+        },
 
-			this.update = function() {			
-			};
-			
-      // load and export our components
-      var _components = {
-        ActionList : ActionList( engine )
-      };
+        function actionListServiceInstanceConstructor( options ) {
 
-      Object.defineProperty(this, 'component', {
-        get : function() {
-          return _components;
-        }
-      });
-      
-      // load and export our resources
-      var _resources = {
-        Action: Action( engine, that )
-      };
-   
-      Object.defineProperty( this, "resource", {
-        get: function() {
-          return _resources;
-        }
-      });
-      
-		});
+            var that = this;
 
-		return ActionListService;
-	};
+            this.update = function() {
+                while( _index < _list.length ) {
+                    var action = _list[_index];
+
+                    if( action.mask & _blockMask ) {
+                        continue;
+                    }
+
+                    if( action.update.call( this ) ) {
+                        _list.splice( _index, 1 );
+                        continue;
+                    }
+                    
+                    if( action.blocking ) {
+                        _blockMask |= action.mask;
+                    }
+                    
+                    ++ _index;
+                }
+            };
+
+            // load and export our components
+            var _components = {
+                    ActionList : ActionList( engine )
+            };
+            Object.defineProperty(this, 'component', {
+                get : function() {
+                    return _components;
+                }
+            });
+
+            // load and export our resources
+            var _resources = {
+                    Action: Action( engine )
+            };
+            Object.defineProperty( this, "resource", {
+                get: function() {
+                    return _resources;
+                }
+            });
+
+        });
+
+        return ActionListService;
+    };
 
 });
