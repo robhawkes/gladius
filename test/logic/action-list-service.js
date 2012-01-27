@@ -43,7 +43,7 @@
         notEqual(al, null, "action list constructed");
         
         engine.actionListService.resource.Action( {
-            url: "assets/test-action.json",
+            url: "javascript:return%20Action(%7Bmask:%200,%20blocking:%20false,%20script:%20function%20actionScript()%20%7B%20return%20true;%20%7D%7D);",
             onsuccess: function (instance) {
                 notEqual(instance, null, "action list constructed");
                 start();
@@ -51,7 +51,7 @@
         } );
 
     });
-
+/*
     asyncTest( 'Run an action that finishes', function() {
         expect( 4 );
 
@@ -61,7 +61,7 @@
         var resources = {};
 
         engine.actionListService.resource.Action({
-            url: "assets/qunit-action1.json",
+            url: "assets/qunit-action1.js",
             onsuccess: function( instance ) {
                 resources[ 'assets/qunit-action1.json' ] = instance;
                 doTest();
@@ -125,7 +125,8 @@
             }
         } );
     });
-    
+*/
+   
     // Test that masks work.
     
     // Test that blocking flag works.

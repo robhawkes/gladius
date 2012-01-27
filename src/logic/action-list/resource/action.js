@@ -10,9 +10,11 @@ define( function ( require ) {
             type: 'Action',
             cache: null
         },
-        function( source ) {
+        function( options ) {
 
-            source = source || {};
+            options = options || {};
+            options.mask = XXXSHOOTME
+            
             source.script = source.script || '';
             //TD: need to test parameter functionality
             source.parameters = source.parameters || [];

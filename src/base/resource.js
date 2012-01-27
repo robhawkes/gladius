@@ -5,7 +5,8 @@
 define( function ( require ) {
 
     var lang = require( 'lang' );
-
+    var Action = require( 'logic/action-list/resource/action' );
+    
     return function( engine ) {
 
         var IResource = function( options ) {
@@ -53,6 +54,15 @@ define( function ( require ) {
                         _onsuccess( _instance );
                     } else {
                         // Fetch the _instance from its source
+                        if (_url.match("^javascript")) {
+                          var scriptSrc = decodeURI(_url.slice("javascript:".length));
+                          console.log("script = " + scriptSrc);
+                          var scriptObj = new Function ( ["Action"], scriptSrc );
+                          
+                          _instance = new c( scriptObj.apply( null, Action ) );
+                          _onsuccess( _instance );
+                          return;                         
+                        }
                         var xhr = new XMLHttpRequest();
                         xhr.open( 'GET', _url, true );
                         xhr.onreadystatechange = function() {
