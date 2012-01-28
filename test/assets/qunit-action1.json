@@ -1,5 +1,0 @@
-{
-    "mask": 0,
-    "blocking": true,
-    "script": "ok( true, 'action has run' ); return true;"
-}
