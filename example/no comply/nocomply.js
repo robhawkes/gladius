@@ -29,6 +29,21 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
           canvas = engine.graphics.target.element;
 
+      new space.Entity({
+                name: 'cube0',
+                components: [
+                    new engine.core.component.Transform({
+                        position: math.Vector3( -50, 8, 35 ),
+                        rotation: math.Vector3( 0, 0, 0 ),
+                        scale: math.Vector3(1,2.5, 1)
+                    }),
+                    new engine.graphics.component.Model({
+                        mesh: resources.mesh,
+                        material: resources.material
+                    })
+                ]
+            })
+      
           var camera = new space.Entity({
             name: 'camera',
             components: [
@@ -64,7 +79,27 @@ document.addEventListener("DOMContentLoaded", function (e) {
         onfailure: function (error) {
           console.log("error loading collada resource: " + error);
         }
-      }], {
+      },
+      
+      {type: engine.graphics.resource.Mesh,
+        url: 'procedural-mesh.js',                          
+        load: engine.core.resource.proceduralLoad,
+        onsuccess: function( mesh ) {
+            resources['mesh'] = mesh;
+        },
+        onfailure: function( error ) {}
+        },
+        {
+            type: engine.graphics.resource.Material,
+            url: 'procedural-material.js',
+            load: engine.core.resource.proceduralLoad,
+            onsuccess: function( material ) {
+                resources['material'] = material;
+            },
+            onfailure: function( error ) {
+            }
+        },
+      ], {
         oncomplete: run
       });
     };
