@@ -2,6 +2,11 @@
 
 document.addEventListener("DOMContentLoaded", function (e) {
 
+    const LEFT_BORDER = 40;
+    const RIGHT_BORDER = 19;
+    const MOVE_SPEED = 0.2;
+    //const JUMP_HEIGHT
+
     var keyStates = [];
 
     var printd = function( div, str ) {
@@ -231,26 +236,24 @@ document.addEventListener("DOMContentLoaded", function (e) {
         var pl = player;
 
         this.moveForward = function(){console.log('already moving forward');};
-        this.moveBackward = function(){console.log('already moving forward');};
-        
-        this.jump = function(){
-          // !!!
-          //alert('figure out this state');
-        };
+        this.moveBackward = function(){console.log('already moving backward');};
 
-        this.idle = function(){pl.setState(pl.getIdleState());};
-        this.block = function(){pl.setState(pl.getBlockState());};
-        this.punch = function(){pl.setState(pl.getPunchState());};
-        this.kick = function(){pl.setState(pl.getKickState());};
+//???        this.forwardJump = function(){pl.setState(pl.getForwardJumpState());};
+        this.jump = function(){pl.setState(pl.getForwardJumpState());};
+
+        this.idle = function(){   pl.setState(pl.getIdleState());};
+        this.block = function(){  pl.setState(pl.getBlockState());};
+        this.punch = function(){  pl.setState(pl.getPunchState());};
+        this.kick = function(){   pl.setState(pl.getKickState());};
         this.throwFireBall = function(){pl.setState(pl.getThrowFireBallState());};
         this.dead = function(){pl.setState(pl.getDeadState());};
         
         this.update = function(t, pc){
             var pos = pc.position;
           // near the boxes of the abandoned house
-          if( pos[2] > 16){
+          if( pos[2] > RIGHT_BORDER){
 
-            pos[2] -= 0.1;
+            pos[2] -= MOVE_SPEED;
             pc.position = pos;
           }
         };
@@ -280,30 +283,12 @@ document.addEventListener("DOMContentLoaded", function (e) {
           console.log('already moving forward');
         };
         
-        this.jump = function(){
-          // !!!
-          //alert('figure out this state');
-        };
-
-        this.idle = function(){
-          pl.setState(pl.getIdleState());
-        };
-            
-        this.block = function(){
-          pl.setState(pl.getBlockState());
-        };
-        
-        this.punch = function(){
-          pl.setState(pl.getPunchState());
-        };
-
-        this.kick = function(){
-          pl.setState(pl.getKickState());
-        };
-
-        this.throwFireBall = function(){
-          pl.setState(pl.getThrowFireBallState());
-        };
+        this.jump = function(){pl.setState(pl.getBackwardJumpState());};
+        this.idle = function(){pl.setState(pl.getIdleState());};
+        this.block = function(){pl.setState(pl.getBlockState());};
+        this.punch = function(){pl.setState(pl.getPunchState());};
+        this.kick = function(){pl.setState(pl.getKickState());};
+        this.throwFireBall = function(){pl.setState(pl.getThrowFireBallState());};
         
         this.dead = function(){
           pl.setState(pl.getDeadState());
@@ -312,9 +297,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
         this.update = function(t, pc){
           var pos = pc.position;
           
-          // !!! fix
-          if(pos[2] < 43 ){
-            pos[2] += 0.1;
+          if(pos[2] < LEFT_BORDER ){
+            pos[2] += MOVE_SPEED;
             pc.position = pos;
           }
         };
@@ -328,6 +312,42 @@ document.addEventListener("DOMContentLoaded", function (e) {
       return MoveBackwardState;
     }());
 
+    /**
+      Player is recovering from being hit. At this point they just need to wait until
+      the character gets back up.
+    */
+    var RecoverState = (function(){
+
+      function RecoverState(player){
+        var pl = player;
+        
+        /*
+        this.moveForward = function(){};
+        this.moveBackward = function(){};
+        this.jump = function(){};
+        this.idle = function(){};
+        this.block = function(){};
+        this.punch = function(){};
+        this.kick = function(){};
+        this.throwFireBall = function(){};*/
+        
+        this.dead = function(){
+          pl.setState(pl.getDeadState());
+        }
+
+        this.update = function(t, pc){
+          // change sprite animation here of character getting back up.
+        };
+
+        this.toString = function(){
+          return "Recover State";
+        };
+
+      }
+      
+      return RecoverState;
+    }());
+    
 
   /**
   */
@@ -346,6 +366,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
       
       // !!!
       this.kick = function(){alert('fix me');};
+      this.hit = function(){
+      // !!!
+      // fix me
+      };
+
 
       this.dead = function(){pl.setState(pl.getDeadState());};
       
@@ -383,11 +408,147 @@ document.addEventListener("DOMContentLoaded", function (e) {
   }());
 
 
+
+  /**
+    Character walks forward and jumps
+  */
+  var ForwardJumpState = (function(){
+
+    function ForwardJumpState(player){
+      var pl = player;
+      var jumpTimeElapsed = 0;
+
+      /*this.moveForward = function(){console.log('cant move forward if jumping');};
+      this.moveBackward = function(){console.log('cant move backward if jumping');};
+      this.jump = function(){console.log('already jumping');};
+      this.idle = function(){console.log('cant idle while jumping');};
+      this.block = function(){console.log('cant block if jumping');};
+      this.punch = function(){alert('take care of this case!');};*/
+      
+      // !!!
+      this.kick = function(){alert('fix me');};
+      this.hit = function(){
+      // !!!
+      // fix me
+      };
+
+      this.dead = function(){pl.setState(pl.getDeadState());};
+      
+      this.update = function(t, pc){
+        jumpTimeElapsed += t;
+        
+        if(jumpTimeElapsed < 1){
+          pos = pc.position;
+          pos[1] += Math.sin(jumpTimeElapsed * Math.PI * 2) * 1.013;        
+
+          // Fix this !!!
+          if(pos[2] > RIGHT_BORDER){
+            pos[2] -= MOVE_SPEED;
+            pc.position = pos;
+          }
+
+          pc.position = pos;
+        }
+        
+       if(jumpTimeElapsed >= 1){
+         // !!! fix this
+         pos[1] = 8;
+         pc.position[1] = 8;
+         console.log(pc.position);
+
+         pl.setState(pl.getIdleState());
+         jumpTimeElapsed = 0;
+        
+          /// fix this.
+          // Let's say the user moves forward, jumps then lets go of moving
+          // forward key. They still need to move forward until they land
+          //  player.removeState(player.getMoveForwardState());
+        }
+      };
+
+      this.toString = function(){
+        return "Forward Jump State: " + jumpTimeElapsed;
+      };
+      
+    }
+    return ForwardJumpState;
+  }());
+
+
+  /**
+    Character walks backward and jumps
+  */
+  var BackwardJumpState = (function(){
+
+    function BackwardJumpState(player){
+      var pl = player;
+      var jumpTimeElapsed = 0;
+
+      /*this.moveForward = function(){console.log('cant move forward if jumping');};
+      this.moveBackward = function(){console.log('cant move backward if jumping');};
+      this.jump = function(){console.log('already jumping');};
+      this.idle = function(){console.log('cant idle while jumping');};
+      this.block = function(){console.log('cant block if jumping');};
+      this.punch = function(){alert('take care of this case!');};*/
+      
+      // !!!
+      this.kick = function(){alert('fix me');};
+      this.hit = function(){
+      // !!!
+      // fix me
+      };
+
+      this.dead = function(){pl.setState(pl.getDeadState());};
+      
+      this.update = function(t, pc){
+        jumpTimeElapsed += t;
+        var pos = pc.position;
+                  
+        if(jumpTimeElapsed < 1){
+          pos[1] += Math.sin(jumpTimeElapsed * Math.PI * 2) * 1.013;
+          
+          // Fix this !!!
+          if(pos[2] < LEFT_BORDER){
+            pos[2] += MOVE_SPEED;
+            pc.position = pos;
+          }
+          
+          pc.position = pos;
+        }
+        
+       if(jumpTimeElapsed >= 1){
+         // !!! fix this
+         pos[1] = 8;
+         pc.position[1] = 8;
+         console.log(pc.position);
+
+         pl.setState(pl.getIdleState());
+         jumpTimeElapsed = 0;
+        
+          /// fix this.
+          // Let's say the user moves forward, jumps then lets go of moving
+          // forward key. They still need to move forward until they land
+          //  player.removeState(player.getMoveForwardState());
+        }
+      };
+
+      this.toString = function(){
+        return "Backward Jump State: " + jumpTimeElapsed;
+      };
+      
+    }
+    return BackwardJumpState;
+  }());
+
+
+  
+  
   //
   //
   var Player = (function(){
     
     function Player(){
+      var health = 100;
 
       var idleState    = new IdleState(this);
       var blockState   = new BlockState(this);
@@ -395,9 +556,14 @@ document.addEventListener("DOMContentLoaded", function (e) {
       var punchState   = new PunchState(this);
       var kickState    = new KickState(this);
       var deadState    = new DeadState(this);
+      var recoverState = new RecoverState(this);
       var moveForwardState   = new MoveForwardState(this);
       var moveBackwardState  = new MoveBackwardState(this);
       var throwFireBallState = new ThrowFireBallState(this);
+      
+      var forwardJumpState = new ForwardJumpState(this);
+      var backwardJumpState = new BackwardJumpState(this);
+
       
       // start in an idle state.
       state = idleState;
@@ -405,6 +571,10 @@ document.addEventListener("DOMContentLoaded", function (e) {
       this.moveForward = function(){
         state.moveForward && state.moveForward();
       };
+      
+      this.forwardJump = function(){
+        state.forwardJump && state.forwardJump();
+      }
       
       this.moveBackward = function(){
         state.moveBackward && state.moveBackward();
@@ -460,6 +630,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
         printd('debug', state.toString());
       }
       
+      // smack the player with something
+      this.hit = function(t, pc){
+        state.hit && state.recover();
+      }
+      
       this.stop = function(){
         state = idleState;
       };
@@ -467,17 +642,22 @@ document.addEventListener("DOMContentLoaded", function (e) {
       this.toString = function(){
         return "Player";
       };
-
-      this.getIdleState  = function(){return idleState;};
-      this.getBlockState = function(){return blockState;};
-      this.getJumpState  = function(){return jumpState;};
-      this.getPunchState = function(){return punchState;};
-      this.getKickState  = function(){return kickState;};
-      this.getDeadState  = function(){return deadState;};
+      
+      // convert to getters
+      this.getIdleState    = function(){return idleState;};
+      this.getBlockState   = function(){return blockState;};
+      this.getJumpState    = function(){return jumpState;};
+      this.getPunchState   = function(){return punchState;};
+      this.getKickState    = function(){return kickState;};
+      this.getDeadState    = function(){return deadState;};
+      this.getRecoverState = function(){return recoverState;}
       
       this.getThrowFireBallState = function(){return throwFireBallState;};
       this.getMoveForwardState   = function(){return moveForwardState;};
       this.getMoveBackwardState  = function(){return moveBackwardState;};
+      
+      this.getForwardJumpState  = function(){return forwardJumpState;};
+      this.getBackwardJumpState = function(){return backwardJumpState;}; 
     }
     
     return Player;
