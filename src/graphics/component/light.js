@@ -18,7 +18,8 @@ define( function ( require ) {
 
         options = options || {};
         var _that = this,
-            _transform;
+            _transform,
+            _target;
 
         var _cvr = {
             light: new context.Light({
@@ -28,6 +29,7 @@ define( function ( require ) {
                 diffuse: options.diffuse || [ 1, 1, 1 ],
                 specular: options.specular || [ 1, 1, 1 ],
                 position: [ 0, 0, 0 ],
+                direction: [0, 0, 0],
                 distance: options.distance
             })
         };
@@ -56,6 +58,14 @@ define( function ( require ) {
                 }
             }
         });
+        Object.defineProperty( this, "target", {
+            get: function() {
+              return _target;
+            },
+            set: function( val ){
+              _target = val;
+            }
+          });
 
         this.onComponentOwnerChanged = function( e ){
             _transform = e.data.current.find( "Transform" );
@@ -80,7 +90,10 @@ define( function ( require ) {
         };
 
         this.prepareForRender = function(){
-            _cvr.light.position = _transform.absolute;
+            if( _transform ) {
+                _cvr.light.position = _transform.position;
+                _cvr.light.lookat( _target );
+            }
         }; //prepareForRender
 
     });

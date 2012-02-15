@@ -88,7 +88,7 @@ define( function ( require ) {
       this.prepareForRender = function(){
           if( _transform ){
             _cvr.camera.position = _transform.position;
-            _cvr.camera.lookat( _target );
+            _cvr.camera.target = _target;
           } //if
       }; //prepareForRender
 
