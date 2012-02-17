@@ -158,7 +158,7 @@ document.addEventListener( "DOMContentLoaded", function( e ){
                              new engine.graphics.component.Light({ intensity: 50 })
                              ]
             });
-            camera.find( 'Camera' ).target = [0, 0, 0];
+            camera.find( 'Camera' ).target = player.find( 'Transform' ).position;
             camera.find( 'Light' ).target = player.find( 'Transform' ).position;
 
             /*
