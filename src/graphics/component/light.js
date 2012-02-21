@@ -30,7 +30,7 @@ define( function ( require ) {
                 specular: options.specular || [ 1, 1, 1 ],
                 position: [ 0, 0, 0 ],
                 direction: [0, 0, 0],
-                distance: options.distance
+                distance: options.radius
             })
         };
 

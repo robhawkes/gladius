@@ -58,7 +58,7 @@ define( function ( require ) {
         get: function() {
           return _target;
         },
-        set: function( val ){
+        set: function( val ){ 
           _target = val;
         }
       });
@@ -88,7 +88,8 @@ define( function ( require ) {
       this.prepareForRender = function(){
           if( _transform ){
             _cvr.camera.position = _transform.position;
-            _cvr.camera.target = _target;
+            // _cvr.camera.target = _target; // Why doesn't this work?
+            _cvr.camera.lookat( _target );
           } //if
       }; //prepareForRender
 

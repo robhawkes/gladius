@@ -30,33 +30,123 @@ document.addEventListener( "DOMContentLoaded", function( e ){
             options = options || {};
             
             this.update = function() {
+                var updateEvent = new engine.core.Event({
+                    type: 'Update',
+                    queue: false,
+                    data: {
+                        delta: that.time.delta
+                    }
+                });
                 for( var componentType in that.components ) {
                     for( var entityId in that.components[componentType] ) {
-                        while( that.components[componentType][entityId].handleQueuedEvent() ) {}
+                        var component = that.components[componentType][entityId];
+                        while( component.handleQueuedEvent() ) {}
+                        updateEvent.dispatch( [component] );
                     }
                 }
             };
             
-            var MotionComponent = engine.base.Component({
+            var SimpleMotionComponent = engine.base.Component({
                 type: 'Motion',
                 depends: ['Transform']
             },
             function( options ) {
                 var that = this;
                 var _up = options.up || math.Vector3( 0, 1, 0 );    // Up direction vector in absolute space
-                var _forward = options.forward || math.Vector3( 0, 0, 1 ); // Forward direction vector in 
-                                                                           // relative space.
+                var _directions = {
+                    forward: options.forward || math.Vector3( 0, 0, -1 ),
+                    right: options.right || math.Vector3( 1, 0, 0 ),
+                    reverse: options.reverse || math.Vector3( 0, 0, 1 ),
+                    left: options.left || math.Vector3( -1, 0, 0 )
+                };
+                var _move = null;
+                var _jump = null;
                 
                 this.onMoveStart = function( event ) {
-                    console.log( event.type, event.data );
+                    _move = event.data.direction;
                 };
                 
                 this.onMoveStop = function( event ) {
-                    console.log( event.type, event.data );
+                    _move = null;
                 };
                 
                 this.onJump = function( event ) {
-                    console.log( event.type );
+                    _jump = true;
+                };
+                
+                this.onUpdate = function( event ) {
+                    if( _move ) {
+                        var transform = this.owner.find( 'Transform' );
+                        var direction = math.vector3.multiply( _directions[_move], event.data.delta / 1000 );                        
+                        transform.position = math.vector3.add( transform.position, direction );
+                    }
+                };
+                
+                // Boilerplate component registration; Lets our service know that we exist and want to do things
+                this.onComponentOwnerChanged = function( e ){
+                    if( e.data.previous === null && this.owner !== null ) {
+                        service.registerComponent( this.owner.id, this );
+                    }
+
+                    if( this.owner === null && e.data.previous !== null ) {
+                        service.unregisterComponent( e.data.previous.id, this );
+                    }
+                };
+
+                this.onEntityManagerChanged = function( e ) {
+                    if( e.data.previous === null && e.data.current !== null && this.owner !== null ) {
+                        service.registerComponent( this.owner.id, this );
+                    }
+
+                    if( e.data.previous !== null && e.data.current === null && this.owner !== null ) {
+                        service.unregisterComponent( this.owner.id, this );
+                    }
+                };
+            });
+            
+            var RollingMotionComponent = engine.base.Component({
+                type: 'Motion',
+                depends: ['Transform']
+            },
+            function( options ) {
+                var that = this;
+                var _up = options.up || math.Vector3( 0, 1, 0 );    // Up direction vector in absolute space
+                var _directions = {
+                    forward: math.Vector3( 0, 0, -1 ),
+                    right: math.Vector3( 1, 0, 0 ),
+                    reverse: math.Vector3( 0, 0, 1 ),
+                    left: math.Vector3( -1, 0, 0 )
+                };
+                var _rotations = {
+                    forward: math.Vector3( -1, 0, 0 ),
+                    right: math.Vector3( 0, 0, -1 ),
+                    reverse: math.Vector3( 1, 0, 0 ),
+                    left: math.Vector3( 0, 0, 1 )
+                };
+                var _move = null;
+                var _jump = null;
+                
+                this.onMoveStart = function( event ) {
+                    _move = event.data.direction;
+                };
+                
+                this.onMoveStop = function( event ) {
+                    _move = null;
+                };
+                
+                this.onJump = function( event ) {
+                    _jump = true;
+                };
+                
+                this.onUpdate = function( event ) {
+                    var transform = this.owner.find( 'Transform' );
+                    if( _move ) {
+                        var direction = math.vector3.multiply( _directions[_move], event.data.delta / 1000 );
+                        transform.position = math.vector3.add( transform.position, direction );
+                        
+                        var rotation = math.vector3.multiply( _rotations[_move], event.data.delta / 1000 );
+                        transform.rotation = math.vector3.add( transform.rotation, rotation );
+                    }
                 };
                 
                 // Boilerplate component registration; Lets our service know that we exist and want to do things
@@ -82,7 +172,8 @@ document.addEventListener( "DOMContentLoaded", function( e ){
             });
             
             var _components = {
-                Motion: MotionComponent
+                SimpleMotion: SimpleMotionComponent,
+                RollingMotion: RollingMotionComponent
             };
             Object.defineProperty( this, 'component', {
                 get: function() {
@@ -139,7 +230,23 @@ document.addEventListener( "DOMContentLoaded", function( e ){
                                      }
                                  }
                              }),
-                             new engine.motion.component.Motion()
+                             // NB: Swap this component with engine.motion.component.RollingMotion() to change
+                             // the way the cube moves.
+                             new engine.motion.component.SimpleMotion(),
+                             ]
+            });
+            
+            var light = new space.Entity({
+                parent: player,
+                components: [
+                             new engine.core.component.Transform({
+                                 position: math.Vector3( 0, 0, 2 )
+                             }),
+                             new engine.graphics.component.Light({
+                                 intensity: 1,
+                                 radius: 50,
+                                 target: player.find( 'Transform' ).position
+                             })
                              ]
             });
 
@@ -147,7 +254,7 @@ document.addEventListener( "DOMContentLoaded", function( e ){
                 name: 'camera',
                 components: [
                              new engine.core.component.Transform({
-                                 position: math.Vector3( 0, 1, 0 )
+                                 position: math.Vector3( 0, 3, 5 )
                              }),
                              new engine.graphics.component.Camera({
                                  active: true,
@@ -155,11 +262,9 @@ document.addEventListener( "DOMContentLoaded", function( e ){
                                  height: canvas.height,
                                  fov: 60
                              }),
-                             new engine.graphics.component.Light({ intensity: 50 })
                              ]
             });
             camera.find( 'Camera' ).target = player.find( 'Transform' ).position;
-            camera.find( 'Light' ).target = player.find( 'Transform' ).position;
 
             /*
             var task = new engine.scheduler.Task({
