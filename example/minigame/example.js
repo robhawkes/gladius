@@ -80,6 +80,9 @@ document.addEventListener( "DOMContentLoaded", function( e ){
                         var direction = math.vector3.multiply( _directions[_move], event.data.delta / 1000 );                        
                         transform.position = math.vector3.add( transform.position, direction );
                     }
+                    if( _jump ) {
+                        
+                    }
                 };
                 
                 // Boilerplate component registration; Lets our service know that we exist and want to do things
